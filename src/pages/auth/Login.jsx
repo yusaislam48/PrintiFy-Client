@@ -17,6 +17,7 @@ import { GitHub as GitHubIcon, Google as GoogleIcon } from '@mui/icons-material'
 import { authAPI } from '../../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const isDevelopment = window.location.hostname === 'localhost';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,7 +42,8 @@ const Login = () => {
       console.log('Login attempt with:', { email });
       
       // Direct API call instead of using authAPI.login
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const loginURL = isDevelopment ? '/api/auth/login' : `${API_URL}/api/auth/login`;
+      const response = await fetch(loginURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

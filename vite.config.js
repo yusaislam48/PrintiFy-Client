@@ -55,6 +55,14 @@ export default defineConfig({
         headers: {
           'Access-Control-Allow-Origin': '*'
         }
+      },
+      '/api': {
+        target: 'https://printify-server-production.up.railway.app',
+        changeOrigin: true,
+        secure: false,
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        }
       }
     }
   },

@@ -3,10 +3,13 @@ import { getToken, setToken, removeToken, getRefreshToken, setTokens } from './a
 
 // Get API URL from environment variable
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const isDevelopment = window.location.hostname === 'localhost';
 
 // Create axios instance with the correct base URL
 const api = axios.create({
-  baseURL: `${API_URL}/api`,
+  // In development, use relative URL to leverage Vite's proxy
+  // In production, use the full API URL
+  baseURL: isDevelopment ? '/api' : `${API_URL}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -85,7 +88,8 @@ api.interceptors.response.use(
           throw new Error('No refresh token available');
         }
         
-        const response = await axios.post(`${API_URL}/api/auth/refresh`, {
+        const refreshURL = isDevelopment ? '/api/auth/refresh' : `${API_URL}/api/auth/refresh`;
+        const response = await axios.post(refreshURL, {
           refreshToken
         });
         
@@ -309,7 +313,7 @@ export const printAPI = {
     try {
       // Create a custom instance for file upload with multipart/form-data
       const uploadInstance = axios.create({
-        baseURL: `${API_URL}/api`,
+        baseURL: isDevelopment ? '/api' : `${API_URL}/api`,
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${getToken()}`
@@ -437,7 +441,9 @@ export const printHubAPI = {
     }
     console.log(`Creating direct PDF URL for job: ${jobId}`);
     // Add a timestamp parameter to prevent caching
-    return `${API_URL}/api/print/public/view/${jobId}?t=${Date.now()}`;
+    return isDevelopment 
+      ? `/api/print/public/view/${jobId}?t=${Date.now()}`
+      : `${API_URL}/api/print/public/view/${jobId}?t=${Date.now()}`;
   },
 
   // Test PDF view URL directly
@@ -448,7 +454,9 @@ export const printHubAPI = {
     }
     
     try {
-      const url = `${API_URL}/api/print/public/view/${jobId}`;
+      const url = isDevelopment
+        ? `/api/print/public/view/${jobId}`
+        : `${API_URL}/api/print/public/view/${jobId}`;
       console.log(`Testing PDF URL: ${url}`);
       
       // Make a HEAD request first to check if the endpoint is accessible

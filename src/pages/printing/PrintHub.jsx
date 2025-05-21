@@ -44,8 +44,9 @@ import {
 } from '@mui/icons-material';
 import { printHubAPI } from '../../utils/api';
 
-// Near the top of the file, add this line
+// Near the top of the file, update this line
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const isDevelopment = window.location.hostname === 'localhost';
 
 // Helper function to format date
 const formatDate = (dateString) => {
@@ -312,7 +313,9 @@ const PrintHub = () => {
     // Use the proxy URL if available - this is the most reliable method
     if (job.proxyUrl) {
       console.log('Using proxy URL:', job.proxyUrl);
-      const fullUrl = `${API_URL}${job.proxyUrl}`;
+      const fullUrl = isDevelopment 
+        ? job.proxyUrl  // In development, proxyUrl is already relative
+        : `${API_URL}${job.proxyUrl}`;
       console.log('Generated full proxy URL:', fullUrl);
       return fullUrl;
     }
