@@ -1,4 +1,4 @@
-// Test comment for pushing to the client repository
+// Test comment for pushing to the client repository - Updated
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
