@@ -2,8 +2,16 @@ import axios from 'axios';
 import { getToken, setToken, removeToken, getRefreshToken, setTokens } from './auth';
 
 // Get API URL from environment variable
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const isDevelopment = window.location.hostname === 'localhost';
+const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
+// In Vite, import.meta.env.DEV is automatically set based on the environment
+const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
+
+console.log('API Configuration:', {
+  API_URL,
+  isDevelopment,
+  mode: import.meta.env.MODE,
+  baseURL: isDevelopment ? '/api' : `${API_URL}/api`
+});
 
 // Create axios instance with the correct base URL
 const api = axios.create({

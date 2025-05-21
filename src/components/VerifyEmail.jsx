@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-const isDevelopment = window.location.hostname === 'localhost';
+const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
+const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
 
 const VerifyEmail = () => {
   const [verificationCode, setVerificationCode] = useState('');

@@ -321,8 +321,12 @@ const Dashboard = () => {
     
     // For server proxy
     if (job.proxyUrl) {
-      const apiBaseUrl = window.location.origin.replace('5173', '8080');
-      return `${apiBaseUrl}${job.proxyUrl}`;
+      if (isDevelopment) {
+        return job.proxyUrl; // In development, use the relative URL
+      } else {
+        // In production, use the full API URL with the proxy path
+        return `${API_URL}${job.proxyUrl}`;
+      }
     }
     
     // Fallback to direct Cloudinary URL

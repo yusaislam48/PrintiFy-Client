@@ -313,9 +313,15 @@ const PrintHub = () => {
     // Use the proxy URL if available - this is the most reliable method
     if (job.proxyUrl) {
       console.log('Using proxy URL:', job.proxyUrl);
-      const fullUrl = isDevelopment 
-        ? job.proxyUrl  // In development, proxyUrl is already relative
-        : `${API_URL}${job.proxyUrl}`;
+      
+      let fullUrl;
+      if (isDevelopment) {
+        fullUrl = job.proxyUrl; // In development, use the relative URL
+      } else {
+        // In production, use the full API URL with the proxy path
+        fullUrl = `${API_URL}${job.proxyUrl}`;
+      }
+      
       console.log('Generated full proxy URL:', fullUrl);
       return fullUrl;
     }
