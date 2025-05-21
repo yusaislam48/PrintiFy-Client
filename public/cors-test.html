@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS Test - PrintiFy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>PrintiFy CORS Test</h1>
+    <p>This page helps diagnose CORS issues between the client and server.</p>
+    
+    <div>
+        <button onclick="testDirectAPI()">Test Direct API Call</button>
+        <button onclick="testRelativeAPI()">Test Relative API Call</button>
+        <button onclick="testViaProxy()">Test via Vercel Proxy</button>
+        <button onclick="testFetchWithCredentials()">Test with Credentials</button>
+    </div>
+    
+    <h2>Results:</h2>
+    <pre id="results">Click a button above to test...</pre>
+    
+    <script>
+        const resultsElement = document.getElementById('results');
+        
+        // Log results with formatting
+        function logResult(message, isError = false) {
+            const timestamp = new Date().toISOString();
+            const className = isError ? 'error' : 'success';
+            
+            resultsElement.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>\n`;
+        }
+        
+        // Test direct API call to Railway
+        async function testDirectAPI() {
+            resultsElement.innerHTML = '';
+            logResult('Testing direct API call to Railway...');
+            
+            try {
+                const response = await fetch('https://printify-server-production.up.railway.app/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                const responseText = await response.text();
+                
+                logResult(`Status: ${response.status}`);
+                logResult(`Response: ${responseText}`);
+                
+                // Check response headers
+                logResult('Response Headers:');
+                response.headers.forEach((value, key) => {
+                    logResult(`${key}: ${value}`);
+                });
+            } catch (error) {
+                logResult(`Error: ${error.message}`, true);
+                console.error(error);
+            }
+        }
+        
+        // Test relative API call
+        async function testRelativeAPI() {
+            resultsElement.innerHTML = '';
+            logResult('Testing relative API call...');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                const responseText = await response.text();
+                
+                logResult(`Status: ${response.status}`);
+                logResult(`Response: ${responseText}`);
+            } catch (error) {
+                logResult(`Error: ${error.message}`, true);
+                console.error(error);
+            }
+        }
+        
+        // Test via Vercel proxy (for Vercel deployments)
+        async function testViaProxy() {
+            resultsElement.innerHTML = '';
+            logResult('Testing API call via Vercel proxy...');
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                const responseText = await response.text();
+                
+                logResult(`Status: ${response.status}`);
+                logResult(`Response: ${responseText}`);
+            } catch (error) {
+                logResult(`Error: ${error.message}`, true);
+                console.error(error);
+            }
+        }
+        
+        // Test with credentials
+        async function testFetchWithCredentials() {
+            resultsElement.innerHTML = '';
+            logResult('Testing API call with credentials...');
+            
+            try {
+                // Try direct URL with credentials
+                logResult('Testing direct URL with credentials...');
+                const directResponse = await fetch('https://printify-server-production.up.railway.app/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                logResult(`Direct call status: ${directResponse.status}`);
+                
+                try {
+                    const directResponseData = await directResponse.text();
+                    logResult(`Direct call response: ${directResponseData}`);
+                } catch (respError) {
+                    logResult(`Error parsing direct response: ${respError.message}`, true);
+                }
+                
+                // Try relative URL with credentials
+                logResult('Testing relative URL with credentials...');
+                const relativeResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password'
+                    })
+                });
+                
+                logResult(`Relative call status: ${relativeResponse.status}`);
+                
+                try {
+                    const relativeResponseData = await relativeResponse.text();
+                    logResult(`Relative call response: ${relativeResponseData}`);
+                } catch (respError) {
+                    logResult(`Error parsing relative response: ${respError.message}`, true);
+                }
+                
+                // Report current origin
+                logResult(`Current origin: ${window.location.origin}`);
+                logResult(`Current host: ${window.location.host}`);
+            } catch (error) {
+                logResult(`Error: ${error.message}`, true);
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -5,23 +5,30 @@ import { getToken, setToken, removeToken, getRefreshToken, setTokens } from './a
 const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
 // In Vite, import.meta.env.DEV is automatically set based on the environment
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
+const isVercel = window.location.hostname.includes('vercel.app');
+
+// In development, use the relative URL; on Vercel use the relative URL approach; otherwise use the full API URL
+const BASE_URL = isDevelopment || isVercel 
+  ? '/api' 
+  : `${API_URL}/api`;
 
 console.log('API Configuration:', {
   API_URL,
   isDevelopment,
+  isVercel,
   mode: import.meta.env.MODE,
-  baseURL: isDevelopment ? '/api' : `${API_URL}/api`
+  baseURL: BASE_URL
 });
 
 // Create axios instance with the correct base URL
 const api = axios.create({
-  // In development, use relative URL to leverage Vite's proxy
-  // In production, use the full API URL
-  baseURL: isDevelopment ? '/api' : `${API_URL}/api`,
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000, // 10 second timeout
+  credentials: 'include',
+  withCredentials: true, // Enable credentials for all environments
 });
 
 // Flag to prevent multiple refreshes
@@ -96,9 +103,11 @@ api.interceptors.response.use(
           throw new Error('No refresh token available');
         }
         
-        const refreshURL = isDevelopment ? '/api/auth/refresh' : `${API_URL}/api/auth/refresh`;
+        const refreshURL = `${BASE_URL}/auth/refresh`;
         const response = await axios.post(refreshURL, {
           refreshToken
+        }, {
+          withCredentials: isVercel
         });
         
         const { accessToken } = response.data;
@@ -321,11 +330,12 @@ export const printAPI = {
     try {
       // Create a custom instance for file upload with multipart/form-data
       const uploadInstance = axios.create({
-        baseURL: isDevelopment ? '/api' : `${API_URL}/api`,
+        baseURL: BASE_URL,
         headers: {
           'Content-Type': 'multipart/form-data',
           'Authorization': `Bearer ${getToken()}`
-        }
+        },
+        withCredentials: isVercel
       });
       
       const response = await uploadInstance.post('/print/upload', formData, {
@@ -449,9 +459,7 @@ export const printHubAPI = {
     }
     console.log(`Creating direct PDF URL for job: ${jobId}`);
     // Add a timestamp parameter to prevent caching
-    return isDevelopment 
-      ? `/api/print/public/view/${jobId}?t=${Date.now()}`
-      : `${API_URL}/api/print/public/view/${jobId}?t=${Date.now()}`;
+    return `${BASE_URL}/print/public/view/${jobId}?t=${Date.now()}`;
   },
 
   // Test PDF view URL directly
@@ -462,13 +470,11 @@ export const printHubAPI = {
     }
     
     try {
-      const url = isDevelopment
-        ? `/api/print/public/view/${jobId}`
-        : `${API_URL}/api/print/public/view/${jobId}`;
+      const url = `${BASE_URL}/print/public/view/${jobId}`;
       console.log(`Testing PDF URL: ${url}`);
       
       // Make a HEAD request first to check if the endpoint is accessible
-      const response = await axios.head(url);
+      const response = await axios.head(url, { withCredentials: isVercel });
       return { 
         success: true, 
         status: response.status,

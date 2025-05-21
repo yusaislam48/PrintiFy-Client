@@ -16,8 +16,11 @@ import {
 import { GitHub as GitHubIcon, Google as GoogleIcon } from '@mui/icons-material';
 import { authAPI } from '../../utils/api';
 
+// API URL configuration
 const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
+const isVercel = window.location.hostname.includes('vercel.app');
+const USE_RELATIVE_URL = isDevelopment || isVercel;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,13 +44,18 @@ const Login = () => {
     try {
       console.log('Login attempt with:', { email });
       
+      // Use relative URL for both dev and Vercel, full URL otherwise
+      const loginURL = USE_RELATIVE_URL 
+        ? '/api/auth/login' 
+        : `${API_URL}/api/auth/login`;
+      
       // Direct API call instead of using authAPI.login
-      const loginURL = isDevelopment ? '/api/auth/login' : `${API_URL}/api/auth/login`;
       const response = await fetch(loginURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Always include credentials
         body: JSON.stringify({ email, password }),
       });
       

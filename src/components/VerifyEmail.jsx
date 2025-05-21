@@ -2,8 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+// API URL configuration
 const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
+const isVercel = window.location.hostname.includes('vercel.app');
+const USE_RELATIVE_URL = isDevelopment || isVercel;
 
 const VerifyEmail = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -57,13 +60,18 @@ const VerifyEmail = () => {
       setResendLoading(true);
       setErrorMessage('');
       
+      // Use relative URL for both dev and Vercel, full URL otherwise
+      const resendURL = USE_RELATIVE_URL 
+        ? '/api/auth/resend-verification' 
+        : `${API_URL}/api/auth/resend-verification`;
+      
       // Direct API call instead of using auth.resendVerification
-      const resendURL = isDevelopment ? '/api/auth/resend-verification' : `${API_URL}/api/auth/resend-verification`;
       const response = await fetch(resendURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ email }),
       });
       
@@ -106,13 +114,18 @@ const VerifyEmail = () => {
     try {
       setLoading(true);
       
+      // Use relative URL for both dev and Vercel, full URL otherwise
+      const verifyURL = USE_RELATIVE_URL 
+        ? '/api/auth/verify' 
+        : `${API_URL}/api/auth/verify`;
+      
       // Direct API call instead of using auth.verify
-      const verifyURL = isDevelopment ? '/api/auth/verify' : `${API_URL}/api/auth/verify`;
       const response = await fetch(verifyURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ 
           email, 
           code: verificationCode.toString().trim() 
