@@ -65,6 +65,9 @@ import PDFUpload from '../../components/PDFUpload';
 import ChangePassword from '../../components/ChangePassword';
 import axios from 'axios';
 
+// Near the top of the file, add this line
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // TabPanel component for tab content
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -249,9 +252,8 @@ const Dashboard = () => {
     
     // 1. First try using the server's PDF proxy endpoint
     if (job.proxyUrl) {
-      // Get the API base URL (replace client port with server port)
-      const apiBaseUrl = window.location.origin.replace('5173', '8080');
-      const proxyUrl = `${apiBaseUrl}${job.proxyUrl}`;
+      // Get the API base URL from environment variable
+      const proxyUrl = `${API_URL}${job.proxyUrl}`;
       window.open(proxyUrl, '_blank', 'noopener,noreferrer');
       return;
     }

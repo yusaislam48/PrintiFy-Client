@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import api from '../utils/api';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const VerifyEmail = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -56,7 +57,7 @@ const VerifyEmail = () => {
       setErrorMessage('');
       
       // Direct API call instead of using auth.resendVerification
-      const response = await fetch('http://localhost:8080/api/auth/resend-verification', {
+      const response = await fetch(`${API_URL}/api/auth/resend-verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +105,7 @@ const VerifyEmail = () => {
       setLoading(true);
       
       // Direct API call instead of using auth.verify
-      const response = await fetch('http://localhost:8080/api/auth/verify', {
+      const response = await fetch(`${API_URL}/api/auth/verify`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
