@@ -2,7 +2,7 @@
  * PDF.js Worker Setup Helper
  * 
  * This script helps load the PDF.js worker file in environments where dynamic imports
- * mightbe problematic. It's loaded as a regular script in index.html.
+ * might be problematic. It's loaded as a regular script in index.html.
  */
 
 // This will be replaced with the actual version during build
