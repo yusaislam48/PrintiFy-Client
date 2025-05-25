@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getToken, setToken, removeToken, getRefreshToken, setTokens } from './auth';
 
 // Get API URL from environment variable
-const API_URL = import.meta.env.VITE_API_URL || 'https://printify-server-production.up.railway.app';
+const API_URL = import.meta.env.VITE_API_URL || 'https://printifyapp-564e0522a8a7.herokuapp.com';
 // In Vite, import.meta.env.DEV is automatically set based on the environment
 const isDevelopment = import.meta.env.DEV && window.location.hostname === 'localhost';
 const isVercel = window.location.hostname.includes('vercel.app');

@@ -9,7 +9,7 @@
         "headers": [
           {
             "key": "Access-Control-Allow-Origin",
-            "value": "https://printify-server-production.up.railway.app"
+            "value": "https://printifyapp-564e0522a8a7.herokuapp.com"
           },
           {
             "key": "Access-Control-Allow-Methods", 
@@ -29,7 +29,7 @@
     "rewrites": [
       {
         "source": "/api/:match*",
-        "destination": "https://printify-server-production.up.railway.app/api/:match*"
+        "destination": "https://printifyapp-564e0522a8a7.herokuapp.com/api/:match*"
       },
       {
         "source": "/(.*)",
