@@ -33,6 +33,7 @@ import {
   ToggleOff as ToggleOffIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import { adminBoothManagerAPI } from '../../utils/api';
 
 const BoothManagerManagement = () => {
   const [boothManagers, setBoothManagers] = useState([]);
@@ -73,11 +74,8 @@ const BoothManagerManagement = () => {
   const fetchBoothManagers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/booth-managers`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setBoothManagers(response.data.boothManagers);
+      const boothManagers = await adminBoothManagerAPI.getAllBoothManagers();
+      setBoothManagers(boothManagers);
       setError('');
     } catch (err) {
       console.error('Error fetching booth managers:', err);
@@ -104,7 +102,7 @@ const BoothManagerManagement = () => {
 
       if (editMode) {
         response = await axios.put(
-          `${import.meta.env.VITE_API_URL}/api/booth-managers/${selectedBoothManagerId}`,
+          `/api/booth-managers/${selectedBoothManagerId}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -117,7 +115,7 @@ const BoothManagerManagement = () => {
         });
       } else {
         response = await axios.post(
-          `${import.meta.env.VITE_API_URL}/api/booth-managers`,
+          `/api/booth-managers`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -147,7 +145,7 @@ const BoothManagerManagement = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/booth-managers/${selectedBoothManagerId}`,
+        `/api/booth-managers/${selectedBoothManagerId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -174,7 +172,7 @@ const BoothManagerManagement = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        `${import.meta.env.VITE_API_URL}/api/booth-managers/${boothManager._id}`,
+        `/api/booth-managers/${boothManager._id}`,
         { isActive: !boothManager.isActive },
         {
           headers: { Authorization: `Bearer ${token}` },
