@@ -645,4 +645,94 @@ export const adminAPI = {
   },
 };
 
+// Booth Manager API calls
+export const boothManagerAPI = {
+  // Get booth manager profile
+  getProfile: async () => {
+    try {
+      const response = await api.get('/booth-managers/profile');
+      return response.data.boothManager;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch booth manager profile' };
+    }
+  },
+
+  // Update paper count
+  updatePaperCount: async (paperData) => {
+    try {
+      const response = await api.put('/booth-managers/paper-count', paperData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update paper count' };
+    }
+  },
+
+  // Login as booth manager
+  login: async (credentials) => {
+    try {
+      const response = await api.post('/booth-managers/login', credentials);
+      if (response.data.token) {
+        setToken(response.data.token);
+        localStorage.setItem('boothManager', JSON.stringify(response.data.boothManager));
+      }
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Login failed' };
+    }
+  },
+};
+
+// Admin API for managing booth managers
+export const adminBoothManagerAPI = {
+  // Get all booth managers
+  getAllBoothManagers: async () => {
+    try {
+      const response = await api.get('/booth-managers');
+      return response.data.boothManagers;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch booth managers' };
+    }
+  },
+
+  // Get a booth manager by ID
+  getBoothManagerById: async (id) => {
+    try {
+      const response = await api.get(`/booth-managers/${id}`);
+      return response.data.boothManager;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to fetch booth manager' };
+    }
+  },
+
+  // Create a new booth manager
+  createBoothManager: async (boothManagerData) => {
+    try {
+      const response = await api.post('/booth-managers', boothManagerData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to create booth manager' };
+    }
+  },
+
+  // Update a booth manager
+  updateBoothManager: async (id, boothManagerData) => {
+    try {
+      const response = await api.put(`/booth-managers/${id}`, boothManagerData);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to update booth manager' };
+    }
+  },
+
+  // Delete a booth manager
+  deleteBoothManager: async (id) => {
+    try {
+      const response = await api.delete(`/booth-managers/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to delete booth manager' };
+    }
+  },
+};
+
 export default api; 

@@ -17,6 +17,9 @@ import PrintJobManagement from './pages/admin/PrintJobManagement'
 import PointsManagement from './pages/admin/PointsManagement'
 import AdminSettings from './pages/admin/AdminSettings'
 import AdminHistory from './pages/admin/AdminHistory'
+import BoothManagerManagement from './pages/admin/BoothManagerManagement'
+import BoothManagerLayout from './pages/boothManager/BoothManagerLayout'
+import BoothManagerDashboard from './pages/boothManager/BoothManagerDashboard'
 import './App.css'
 
 // Protected route component
@@ -94,6 +97,61 @@ const AdminRoute = ({ children }) => {
   return children
 }
 
+// Booth Manager route component - check booth manager role
+const BoothManagerRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('token') !== null
+  const [loading, setLoading] = React.useState(true)
+  const [isBoothManager, setIsBoothManager] = React.useState(false)
+  
+  React.useEffect(() => {
+    // Check if user is a booth manager
+    const checkBoothManagerStatus = async () => {
+      try {
+        // Try to fetch booth manager profile
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/booth-managers/profile`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          setIsBoothManager(true);
+        } else {
+          setIsBoothManager(false);
+        }
+      } catch (error) {
+        console.error('Error checking booth manager status:', error)
+        setIsBoothManager(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+    
+    if (isAuthenticated) {
+      checkBoothManagerStatus()
+    } else {
+      setLoading(false)
+    }
+  }, [isAuthenticated])
+  
+  if (loading) {
+    // Show loading state while checking booth manager status
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <p>Loading...</p>
+    </div>
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />
+  }
+  
+  if (!isBoothManager) {
+    return <Navigate to="/login" />
+  }
+  
+  return children
+}
+
 // Root redirect component to check user role and redirect accordingly
 const RootRedirect = () => {
   const isAuthenticated = localStorage.getItem('token') !== null
@@ -115,11 +173,26 @@ const RootRedirect = () => {
         if (userData) {
           if (userData.role === 'admin' || userData.role === 'master' || userData.isAdmin === true) {
             setRedirectPath('/admin')
-          } else {
-            setRedirectPath('/dashboard')
+            setLoading(false)
+            return
           }
-          setLoading(false)
-          return
+        }
+        
+        // Check if user is a booth manager
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL}/api/booth-managers/profile`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+          
+          if (response.ok) {
+            setRedirectPath('/booth-manager/dashboard');
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          console.error('Error checking booth manager status:', error)
         }
         
         // If no cached data, fetch from API
@@ -209,6 +282,19 @@ function App() {
             <Route path="history" element={<AdminHistory />} />
             <Route path="points" element={<PointsManagement />} />
             <Route path="settings" element={<AdminSettings />} />
+            <Route path="booth-managers" element={<BoothManagerManagement />} />
+          </Route>
+          
+          {/* Booth Manager Routes */}
+          <Route 
+            path="/booth-manager" 
+            element={
+              <BoothManagerRoute>
+                <BoothManagerLayout />
+              </BoothManagerRoute>
+            }
+          >
+            <Route path="dashboard" element={<BoothManagerDashboard />} />
           </Route>
           
           {/* Redirect root to dashboard if logged in, otherwise to login */}
